@@ -20,7 +20,7 @@ struct WeatherEndpoint: APIEndpoint {
         [
             URLQueryItem(name: "latitude", value: "\(latitude)"),
             URLQueryItem(name: "longitude", value: "\(longitude)"),
-            URLQueryItem(name: "current", value: "temperature_2m,wind_speed_10m,precipitation"),
+            URLQueryItem(name: "current", value: "temperature_2m,wind_speed_10m,precipitation,weathercode"),
             URLQueryItem(name: "daily", value: "temperature_2m_max,temperature_2m_min"),
             URLQueryItem(name: "timezone", value: "auto")
         ]

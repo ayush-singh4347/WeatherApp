@@ -73,11 +73,12 @@
 //                    )
 //    }
 //}
+
 import SwiftUI
 
 struct LocationListView: View {
 
-    let viewModel = LocationListViewModel()
+    @StateObject private var viewModel = LocationListViewModel()
     @State private var searchText = ""
 
     var filteredLocations: [Location] {
@@ -89,7 +90,7 @@ struct LocationListView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
 
             // Search Bar
             HStack {
@@ -99,21 +100,35 @@ struct LocationListView: View {
             .padding()
             .background(Color(.systemGray6))
             .cornerRadius(14)
-            .padding()
+            .padding(.horizontal)
 
-            // List Card
+            // List
             VStack(spacing: 0) {
                 ForEach(filteredLocations) { location in
+
+                    let cached = viewModel.cachedWeather[location.name]
+
                     NavigationLink {
                         LocationDetailView(location: location)
                     } label: {
                         HStack {
-                            Text(location.name)
-                                .foregroundColor(.primary)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(location.name)
+                                    .font(.headline)
+
+                                Text(
+                                    cached != nil
+                                    ? "\(Int(cached!.currentTemp)) °C"
+                                    : "--"
+                                )
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            }
 
                             Spacer()
 
-                            weatherIcon(for: location.name)
+                            Image(systemName: icon(for: cached?.weatherType))
                                 .foregroundColor(.yellow)
 
                             Image(systemName: "chevron.right")
@@ -127,24 +142,37 @@ struct LocationListView: View {
             }
             .background(Color(.systemBackground))
             .cornerRadius(20)
-            .padding()
+            .padding(.horizontal)
 
             Spacer()
         }
         .navigationTitle("Locations")
-    }
-
-    // Temporary demo icons (can later be API-based)
-    func weatherIcon(for city: String) -> Image {
-        switch city {
-        case "Manali":
-            return Image(systemName: "snowflake")
-        case "Kolkata":
-            return Image(systemName: "cloud.rain")
-        case "New Delhi", "Hyderabad":
-            return Image(systemName: "cloud.fog")
-        default:
-            return Image(systemName: "sun.max")
+        .onAppear {
+            viewModel.loadCachedWeather()
         }
     }
-}
+
+    // Weather icon mapping
+    func icon(for type: String?) -> String {
+        switch type {
+        case "rainy":
+            return "cloud.rain.fill"
+        case "windy":
+            return "wind"
+        case "foggy":
+            return "cloud.fog.fill"
+        case "cloudy":
+            return "cloud.fill"
+        case "snow":
+            return "snowflake"
+        case "storm":
+            return "cloud.bolt.rain.fill"
+        case "sunny":
+            return "sun.max.fill"
+        default:
+            return "sun.max"
+        }
+    }
+
+    }
+

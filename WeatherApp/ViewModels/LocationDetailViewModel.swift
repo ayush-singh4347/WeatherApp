@@ -78,6 +78,7 @@ final class LocationDetailViewModel: ObservableObject {
     @Published var minTemp = "--"
     @Published var windSpeed = "--"
     @Published var precipitation = "--"
+    @Published var weatherIcon = "sun.max"
     @Published var isLoading = false
 
     private let service = WeatherService()
@@ -86,20 +87,28 @@ final class LocationDetailViewModel: ObservableObject {
         isLoading = true
 
         do {
-            let response = try await service.fetchWeather(
-                latitude: location.latitude,
-                longitude: location.longitude
-            )
+            let cached = try await service.fetchWeather(for: location)
 
-            temperature = "\(response.current.temperature2M) \(response.currentUnits.temperature2M)"
-            windSpeed = "\(response.current.windSpeed10M) \(response.currentUnits.windSpeed10M)"
-            precipitation = "\(response.current.precipitation) \(response.currentUnits.precipitation)"
-            maxTemp = "\(response.daily.temperature2MMax.first ?? 0) \(response.dailyUnits.temperature2MMax)"
-            minTemp = "\(response.daily.temperature2MMin.first ?? 0) \(response.dailyUnits.temperature2MMin)"
+            temperature = "\(cached.currentTemp) °C"
+            maxTemp = "\(cached.maxTemp) °C"
+            minTemp = "\(cached.minTemp) °C"
+            windSpeed = "\(cached.windSpeed) km/h"
+            precipitation = "\(cached.precipitation) mm"
+            weatherIcon = icon(from: cached.weatherType ?? "sunny")
         } catch {
             temperature = "Error"
         }
 
         isLoading = false
     }
+
+    private func icon(from type: String) -> String {
+        switch type {
+        case "rainy": return "cloud.rain"
+        case "windy": return "wind"
+        case "foggy": return "cloud.fog"
+        default: return "sun.max"
+        }
+    }
 }
+

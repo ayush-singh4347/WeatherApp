@@ -6,8 +6,11 @@
 //
 
 import Foundation
+import Combine
 
-final class LocationListViewModel {
+@MainActor
+final class LocationListViewModel:ObservableObject {
+    @Published var cachedWeather: [String:CoreData] = [:]
 
     let locations: [Location] = [
         Location(name: "Mumbai", latitude: 19.0760, longitude: 72.8777),
@@ -19,4 +22,15 @@ final class LocationListViewModel {
         Location(name: "Bengaluru", latitude: 12.9716, longitude: 77.5946),
         Location(name: "Manali", latitude: 32.2396, longitude: 77.1887)
     ]
+    private let cache = WeatherCoreManager()
+
+    func loadCachedWeather() {
+        cachedWeather.removeAll()
+        
+        for location in locations {
+            if let cached = WeatherCoreManager().fetchWeather(for: location.name) {
+                cachedWeather[location.name] = cached
+            }
+        }
+    }
 }
