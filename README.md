@@ -1,7 +1,7 @@
 <h1>🌦 Weather App (SwiftUI)</h1>
 
 <p>
-A modern <strong>Weather App built using SwiftUI</strong> that demonstrates real-world iOS concepts such as
+A  modern <strong>Weather App built using SwiftUI</strong> that demonstrates real-world iOS concepts such as
 <strong>MVVM architecture</strong>, <strong>async/await networking</strong>, <strong>Core Data caching</strong>,
 <strong>NavigationStack</strong>, and a clean, responsive UI.
 </p>
